@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.noname.myproject.dao.CommunityMapper">
+
+	<select id="getQuestionList" parameterType="map" resultType="question">
+		SELECT *
+		FROM question
+		<where>
+			<if test="Item == 'userid'">
+				UPPER(userID) LIKE UPPER('%'|| #{Key} ||'%')
+			</if>
+			
+			<if test="Item == 'content'">
+				UPPER(content) LIKE UPPER('%'|| #{Key} ||'%')
+			</if>
+			
+			<if test="Item == 'title'">
+				UPPER(title) LIKE UPPER('%'|| #{Key} ||'%')
+			</if>
+		</where>
+		ORDER BY
+		boardnum DESC
+	</select>
+	
+	<select id="getTotal" parameterType="map" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			question
+		WHERE
+			<choose>
+				<when test="searchItem == 'userid'">UPPER(userID)</when>
+				<when test="searchItem == 'title'">UPPER(title)</when>
+				<when test="searchItem == 'content'">UPPER(content)</when>
+			</choose>
+			LIKE UPPER('%'|| #{searchKey} ||'%')
+	</select>
+	
+	<insert id="questionWrite" parameterType="question">
+		INSERT INTO
+			question
+		VALUES (
+			questSeq.nextval,
+			#{userID},
+			#{title},
+			#{content},
+			default,
+			0
+		)
+	</insert>
+	
+	<delete id="delete_quest" parameterType="question">
+	 	DELETE question
+	 	WHERE
+	 		boardnum = #{boardnum}
+	 		and
+	 		userid = #{userID}
+	 </delete>
+	
+	<update id="update_quest_hit" parameterType="question">
+		UPDATE
+			question
+		SET
+			hit = hit + 1
+		WHERE
+			boardnum = #{boardnum}
+	</update>
+	
+	<select id="read_quest" parameterType="question" resultType="question">
+		SELECT *
+		FROM question
+		WHERE
+			boardnum = #{boardnum}
+	 </select>
+	 
+	 <update id="update_quest" parameterType="question">
+		UPDATE
+			question
+		SET
+			title = #{title},
+			content = #{content}
+		WHERE
+			boardnum = #{boardnum}
+			and
+			userid = #{userID}
+	</update>
+	
+	<insert id="write_quest_reply" parameterType="reply_quest">
+		INSERT INTO
+			reply_quest
+		VALUES (
+			reply_quest_seq.nextval,
+			#{boardnum},
+			#{userID},
+			#{replyText},
+			SYSDATE
+		)
+	</insert>
+	
+	<select id="read_quest_reply" parameterType="int" resultType="reply_quest">
+		SELECT
+			*
+		FROM
+			reply_quest
+		WHERE
+			boardnum = #{boardnum}
+		ORDER BY
+			replynum DESC
+	</select>
+	
+	<delete id="delete_quest_reply" parameterType="reply_quest">
+		DELETE
+			reply_quest
+		WHERE
+			replynum = #{replynum}
+		AND
+			userid = #{userID}
+	</delete>
+	
+</mapper>

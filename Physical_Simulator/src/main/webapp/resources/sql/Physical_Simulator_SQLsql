@@ -1,0 +1,47 @@
+DROP TABLE reply_quest;
+DROP TABLE question;
+DROP TABLE account;
+DROP SEQUENCE userSeq;
+DROP SEQUENCE questSeq;
+DROP SEQUENCE reply_quest_seq;
+
+CREATE TABLE account (
+    userSeq     NUMBER(5) CONSTRAINT ACCOUNT_FK PRIMARY KEY,
+    userID      VARCHAR2(10) UNIQUE NOT NULL,
+    userPW      VARCHAR2(15) NOT NULL,
+    userName    VARCHAR2(15) NOT NULL,
+    userPhone   VARCHAR2(15) NOT NULL,
+    userBirth   DATE NOT NULL,
+    userQuest   CHAR(1) NOT NULL,
+    userAnswer  VARCHAR2(15) NOT NULL,
+    CONSTRAINT quest_CK CHECK(userQuest IN ('A','B','C','D','E'))
+);
+
+CREATE SEQUENCE userSeq;
+
+
+
+CREATE TABLE question(
+    boardnum    NUMBER          PRIMARY KEY,
+    userID      VARCHAR2(10)    NOT NULL,
+    title       VARCHAR2(100)    NOT NULL,
+    content     VARCHAR2(2000)  NOT NULL,
+    inputdate   DATE            DEFAULT SYSDATE,
+    hit         NUMBER          DEFAULT 0,
+    CONSTRAINT QUESTION_FK FOREIGN KEY(userID)
+	REFERENCES account(userID) ON DELETE CASCADE
+);
+
+CREATE SEQUENCE questSeq;
+
+CREATE TABLE reply_quest(
+    replynum    NUMBER          PRIMARY KEY,
+    boardnum    NUMBER          NOT NULL,
+    userid      VARCHAR2(10)    NOT NULL,
+    replytext   VARCHAR2(500)  NOT NULL,
+    inputdate   DATE            DEFAULT SYSDATE,
+    CONSTRAINT QUEST_REPLY_FK FOREIGN KEY(boardnum)
+	REFERENCES question(boardnum) ON DELETE CASCADE
+);
+
+CREATE SEQUENCE reply_quest_seq;
